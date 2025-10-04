@@ -1,7 +1,6 @@
 streamlit==1.29.0
-tensorflow==2.20.0
-keras==2.20.0
-numpy==1.24.4
-pandas==2.1.1          # optional, for handling datasets
-nltk==3.9.3            # optional, for text preprocessing (tokenization)
-tensorflow-text==2.20.0 # optional, if using advanced text preprocessing
+tensorflow==2.20.0  # includes Keras
+numpy>=1.26.0        # compatible with TF 2.20
+pandas               # optional, if using CSVs/datasets
+nltk                 # optional, if doing tokenization/preprocessing
+rich                 # installed automatically by Streamlit, optional
