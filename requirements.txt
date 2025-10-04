@@ -1,6 +1,18 @@
-streamlit==1.29.0
-tensorflow==2.20.0  # includes Keras
-numpy>=1.26.0        # compatible with TF 2.20
-pandas               # optional, if using CSVs/datasets
-nltk                 # optional, if doing tokenization/preprocessing
-rich                 # installed automatically by Streamlit, optional
+# Core
+streamlit>=1.32.0
+
+# Machine Learning
+tensorflow==2.20.0
+
+# Data processing
+numpy>=1.26.0
+pandas
+nltk
+
+# Extras
+rich
+altair
+blinker
+cachetools
+click
+importlib-metadata
