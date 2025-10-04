@@ -1,5 +1,7 @@
 streamlit==1.29.0
-tensorflow==2.14.0
+tensorflow==2.20.0
+keras==2.20.0
 numpy==1.24.4
-keras==2.14.0
-pickle5==0.0.12
+pandas==2.1.1          # optional, for handling datasets
+nltk==3.9.3            # optional, for text preprocessing (tokenization)
+tensorflow-text==2.20.0 # optional, if using advanced text preprocessing
