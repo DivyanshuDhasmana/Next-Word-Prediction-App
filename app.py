@@ -28,16 +28,13 @@ index_word = {index: word for word, index in tokenizer.word_index.items()}
 
 # ----------------- Prediction Function -----------------
 def predict_next_words(seed_text, top_n=5):
-    # Convert text to sequence
     sequence = tokenizer.texts_to_sequences([seed_text])[0]
     sequence = pad_sequences([sequence], maxlen=seq_length, padding='pre')
     
-    # Predict next word probabilities
     predicted_probs = model.predict(sequence, verbose=0)[0]
     
-    # Get top N predicted word indices
     top_indices = predicted_probs.argsort()[-top_n:][::-1]
-    top_words = [(index_word.get(i, ""), float(predicted_probs[i])) for i in top_indices]
+    top_words = [index_word.get(i, "") for i in top_indices]
     
     return top_words
 
@@ -51,5 +48,4 @@ top_n = st.slider("Number of Predictions to Show", 1, 10, 5)
 if st.button("Predict"):
     predictions = predict_next_words(user_input, top_n=top_n)
     st.subheader("Top Predicted Next Words:")
-    for word, prob in predictions:
-        st.write(f"**{word}** — {prob:.4f}")
+    st.write(", ".join(predictions))
