@@ -27,60 +27,29 @@ model.load_weights("my_model.weights.h5")
 index_word = {index: word for word, index in tokenizer.word_index.items()}
 
 # ----------------- Prediction Function -----------------
-def predict_next_words(seed_text, top_k=5):
-    # Convert input text to sequence
+def predict_next_words(seed_text, top_n=5):
+    # Convert text to sequence
     sequence = tokenizer.texts_to_sequences([seed_text])[0]
-    if len(sequence) == 0:
-        return ["No valid input"]
-
-    # Pad to the same sequence length as training
     sequence = pad_sequences([sequence], maxlen=seq_length, padding='pre')
-
-    # Predict probabilities for all words
+    
+    # Predict next word probabilities
     predicted_probs = model.predict(sequence, verbose=0)[0]
-
-    # Get top K word indices (sorted by probability)
-    top_indices = predicted_probs.argsort()[-top_k:][::-1]
-    top_words = [index_word.get(i, '') for i in top_indices if i in index_word]
-
+    
+    # Get top N predicted word indices
+    top_indices = predicted_probs.argsort()[-top_n:][::-1]
+    top_words = [(index_word.get(i, ""), float(predicted_probs[i])) for i in top_indices]
+    
     return top_words
 
+# ----------------- Streamlit UI -----------------
+st.title("Next Word Prediction App")
+st.write("Enter a text and see the top predicted next words!")
 
-# ----------------- Streamlit UI (Modernized) -----------------
-st.set_page_config(page_title="Next Word Predictor", layout="wide")
+user_input = st.text_input("Your Text Here", "Once upon a time")
+top_n = st.slider("Number of Predictions to Show", 1, 10, 5)
 
-# Top-right corner name
-st.markdown(
-    """
-    <div style="
-        position: absolute;
-        top: 10px;
-        right: 20px;
-        font-size: 20px;
-        font-weight: bold;
-        color: #1f77b4;
-        text-decoration: underline;
-        z-index: 1000;
-    ">
-        Ayush Dwivedi
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-st.title("🧠 Next Word Predictor (LSTM)")
-st.markdown("Type a few words, and the model will predict the **most likely next words**.")
-
-# User input area
-user_input = st.text_area("Enter your sentence:", height=100, placeholder="e.g., Once upon a")
-top_k = st.slider("Number of next-word suggestions:", min_value=1, max_value=10, value=5)
-
-# Predict button
 if st.button("Predict"):
-    if user_input.strip() == "":
-        st.warning("Please enter some text first.")
-    else:
-        suggestions = predict_next_words(user_input, top_k=top_k)
-        st.success("Top Predicted Next Word(s):")
-        for i, word in enumerate(suggestions, 1):
-            st.write(f"**{i}.** {word}"
+    predictions = predict_next_words(user_input, top_n=top_n)
+    st.subheader("Top Predicted Next Words:")
+    for word, prob in predictions:
+        st.write(f"**{word}** — {prob:.4f}")
