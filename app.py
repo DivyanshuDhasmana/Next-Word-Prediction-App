@@ -28,24 +28,28 @@ index_word = {index: word for word, index in tokenizer.word_index.items()}
 
 # ----------------- Prediction Function -----------------
 def predict_next_words(seed_text, top_k=5):
-    """Predict top K next words for given seed text"""
+    # Convert input text to sequence
     sequence = tokenizer.texts_to_sequences([seed_text])[0]
     if len(sequence) == 0:
         return ["No valid input"]
 
+    # Pad to the same sequence length as training
     sequence = pad_sequences([sequence], maxlen=seq_length, padding='pre')
+
+    # Predict probabilities for all words
     predicted_probs = model.predict(sequence, verbose=0)[0]
 
-    # Get top K predictions
+    # Get top K word indices (sorted by probability)
     top_indices = predicted_probs.argsort()[-top_k:][::-1]
     top_words = [index_word.get(i, '') for i in top_indices if i in index_word]
 
     return top_words
 
-# ----------------- Streamlit UI -----------------
+
+# ----------------- Streamlit UI (Modernized) -----------------
 st.set_page_config(page_title="Next Word Predictor", layout="wide")
 
-# Top-right name
+# Top-right corner name
 st.markdown(
     """
     <div style="
@@ -65,11 +69,11 @@ st.markdown(
 )
 
 st.title("🧠 Next Word Predictor (LSTM)")
-st.markdown("Type a few words, and the model will suggest the most probable next words.")
+st.markdown("Type a few words, and the model will predict the **most likely next words**.")
 
-# User input section
+# User input area
 user_input = st.text_area("Enter your sentence:", height=100, placeholder="e.g., Once upon a")
-top_k = st.slider("Number of suggestions to show:", min_value=1, max_value=10, value=5)
+top_k = st.slider("Number of next-word suggestions:", min_value=1, max_value=10, value=5)
 
 # Predict button
 if st.button("Predict"):
@@ -77,6 +81,6 @@ if st.button("Predict"):
         st.warning("Please enter some text first.")
     else:
         suggestions = predict_next_words(user_input, top_k=top_k)
-        st.success("Predicted Next Word Suggestions:")
+        st.success("Top Predicted Next Word(s):")
         for i, word in enumerate(suggestions, 1):
-            st.write(f"**{i}.** {word}")
+            st.write(f"**{i}.** {word}"
