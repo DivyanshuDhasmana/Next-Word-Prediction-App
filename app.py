@@ -31,29 +31,50 @@ index_word = {index: word for word, index in tokenizer.word_index.items()}
 def generate_text(seed_text, next_words=10):
     result = seed_text
     for _ in range(next_words):
-        # Convert text to sequence
         sequence = tokenizer.texts_to_sequences([seed_text])[0]
-        # Pad sequence
         sequence = pad_sequences([sequence], maxlen=seq_length, padding='pre')
-        # Predict next word
         predicted_probs = model.predict(sequence, verbose=0)[0]
         predicted_index = np.argmax(predicted_probs)
         predicted_word = index_word.get(predicted_index, '')
-        # Append predicted word
         result += ' ' + predicted_word
-        # Update seed_text
         seed_text += ' ' + predicted_word
-        seed_text = ' '.join(seed_text.split()[1:])  # shift window
+        seed_text = ' '.join(seed_text.split()[1:])
     return result
 
 # ----------------- Streamlit UI -----------------
-st.title("Next Word Prediction App")
-st.write("Enter some text and let the model predict the next words!")
+st.set_page_config(page_title="Next Word Predictor", layout="wide")
 
-user_input = st.text_input("Your Text Here", "Once upon a time")
-num_words = st.slider("Number of Words to Predict", 1, 20, 10)
+# Top-right name
+st.markdown(
+    """
+    <div style="
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 20px;
+        font-weight: bold;
+        color: #1f77b4;
+        text-decoration: underline;
+        z-index: 1000;
+    ">
+        Divyashu Dhasmana
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
+st.title("🧠 Next Word Predictor (LSTM)")
+st.markdown("Type a few words, and the model will generate the next words for you.")
+
+# User input section
+user_input = st.text_area("Enter your sentence:", height=100, placeholder="e.g., Once upon a time")
+num_words = st.slider("Number of words to predict:", min_value=1, max_value=20, value=10)
+
+# Predict button
 if st.button("Predict"):
-    output = generate_text(user_input, next_words=num_words)
-    st.subheader("Predicted Text:")
-    st.write(output)
+    if user_input.strip() == "":
+        st.warning("Please enter some text first.")
+    else:
+        output = generate_text(user_input, next_words=num_words)
+        st.success("Predicted Text:")
+        st.write(output)
