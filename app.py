@@ -48,4 +48,7 @@ top_n = st.slider("Number of Predictions to Show", 1, 10, 5)
 if st.button("Predict"):
     predictions = predict_next_words(user_input, top_n=top_n)
     st.subheader("Top Predicted Next Words:")
-    st.write(", ".join(predictions))
+    # Display predictions line by line
+    for word in predictions:
+        st.write(word)
+
